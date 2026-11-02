@@ -15,24 +15,46 @@ else:
     from recommender import load_songs, recommend_songs
 
 
+USER_PROFILES = {
+    "High-Energy Pop": {"genre": "pop", "mood": "happy", "energy": 0.9},
+    "Chill Lofi": {"genre": "lofi", "mood": "chill", "energy": 0.4},
+    "Deep Intense Rock": {"genre": "rock", "mood": "intense", "energy": 0.95},
+    "High Energy, Sad Mood (conflicting)": {
+        "genre": "pop",
+        "mood": "sad",
+        "energy": 0.95,
+    },
+    "Out-of-Range Energy": {"favorite_genre": "classical", "target_energy": 2.0},
+    "No Preferences (edge case)": {},
+    "Minimum Energy Boundary": {"energy": 0.0},
+    "Conflicting Key Aliases": {
+        "genre": "pop",
+        "favorite_genre": "classical",
+        "mood": "happy",
+        "favorite_mood": "sad",
+        "energy": 0.1,
+        "target_energy": 0.9,
+    },
+}
+
+
 def main() -> None:
-    songs = load_songs("data/songs.csv") 
+    songs = load_songs("data/songs.csv")
     print(f"Loaded songs: {len(songs)}")
 
-    # Starter example profile
-    user_prefs = {"genre": "pop", "mood": "happy", "energy": 0.8}
+    for profile_name, user_prefs in USER_PROFILES.items():
+        recommendations = recommend_songs(user_prefs, songs, k=5)
 
-    recommendations = recommend_songs(user_prefs, songs, k=5)
-
-    print("\nTop recommendations for genre='pop', mood='happy':")
-    print("=" * 48)
-    for rank, (song, score, explanation) in enumerate(recommendations, start=1):
-        print(f"{rank}. {song['title']} - {song['artist']}")
-        print(f"   Score: {score:.2f}")
-        print("   Reasons:")
-        for reason in explanation.split("; "):
-            print(f"   - {reason}")
-        print()
+        print(f"\nTop recommendations for profile: {profile_name}")
+        print(f"Preferences: {user_prefs}")
+        print("=" * 48)
+        for rank, (song, score, explanation) in enumerate(recommendations, start=1):
+            print(f"{rank}. {song['title']} - {song['artist']}")
+            print(f"   Score: {score:.2f}")
+            print("   Reasons:")
+            for reason in explanation.split("; "):
+                print(f"   - {reason}")
+            print()
 
 
 if __name__ == "__main__":
